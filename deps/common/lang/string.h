@@ -170,5 +170,13 @@ std::string get_type_name(const T &val)
   ::free(stmp);
   return sret;
 }
+// Reference: https://github.com/CentaureaHO/miniob/blob/oceanbase-competition-2023/deps/common/lang/string.h
+// 为DATE类型的设计的格式转换与非法输入判断
+    extern bool IsLeapYear(int Year);
+    extern bool IsDateValid(int y, int m, int d); 
+    extern void StrDate2IntDate(const char *StrDate, int &IntDate);
+    extern std::string IntDate2StrDate(int IntDate);
+
+    extern bool CheckDate(int IntDate);
 
 }  // namespace common

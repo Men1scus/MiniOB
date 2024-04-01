@@ -15,7 +15,7 @@ See the Mulan PSL v2 for more details. */
 #pragma once
 
 #include <string>
-#include "DateProcessor.h" // Reference: https://github.com/CentaureaHO/miniob/blob/main/src/observer/sql/parser/value.cpp
+
 /**
  * @brief 属性的类型
  *

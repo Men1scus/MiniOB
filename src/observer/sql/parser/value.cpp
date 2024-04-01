@@ -47,10 +47,10 @@ Value::Value(bool val) { set_boolean(val); }
 Value::Value(const char *s, int len /*= 0*/) { set_string(s, len); }
 
 // Value::Value(int val) { set_date(val); }
-// Reference: https://github.com/CentaureaHO/miniob/blob/main/src/observer/sql/parser/value.cpp
+// Reference: https://github.com/CentaureaHO/miniob/blob/oceanbase-competition-2023/src/observer/sql/parser/value.cpp
 Value::Value(const char* date, int len, int flag){
   int IntDate = 0;
-  StrDate2IntDate(date, IntDate);
+  common::StrDate2IntDate(date, IntDate);
   set_date(IntDate);
 }
 void Value::set_data(char *data, int length)
@@ -170,9 +170,9 @@ std::string Value::to_string() const
     case CHARS: {
       os << str_value_;
     } break;
-    // Reference: https://github.com/CentaureaHO/miniob/blob/main/src/observer/sql/parser/value.cpp
+    // Reference: https://github.com/CentaureaHO/miniob/blob/oceanbase-competition-2023/src/observer/sql/parser/value.cpp
     case DATES: {
-      os << IntDate2StrDate(num_value_.date_value_); 
+      os << common::IntDate2StrDate(num_value_.date_value_); 
     }
     default: {
       LOG_WARN("unsupported attr type: %d", attr_type_);

@@ -284,4 +284,85 @@ std::string double_to_str(double v)
 
   return std::string(buf, len);
 }
+// Reference: https://github.com/CentaureaHO/miniob/blob/oceanbase-competition-2023/deps/common/lang/string.cpp
+  /**
+     * 为日期类型设计的格式转换与非法输入判断
+     */
+    #define MinInt 0x80000000
+    bool IsLeapYear(int Year)
+    {
+        if ((Year % 4 == 0 && Year % 100 != 0) || Year % 400 == 0) return 1;
+        return 0;
+    }
+
+    bool IsDateValid(int y, int m, int d)
+    {
+        if (y > 5000000) return 0;
+        int MonthDays[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        if (IsLeapYear(y)) MonthDays[2] = 29;
+
+        return m > 0 && m <= 12 && d > 0 && d <= MonthDays[m];
+    }
+
+    void StrDate2IntDate(const char* StrDate, int& IntDate)
+    {
+        int Year, Month, Day;
+        sscanf(StrDate, "%d-%d-%d", &Year, &Month, &Day);
+        if (!IsDateValid(Year, Month, Day))
+        {
+            IntDate = MinInt;
+            return;
+        }
+
+        bool IsBefore1970 = Year < 1970;
+        IntDate = 0;
+        if (IsBefore1970)
+            for (int y = 1969; y > Year; --y) IntDate -= (IsLeapYear(y) ? 366 : 365);
+        else
+            for (int y = 1970; y < Year; ++y) IntDate += (IsLeapYear(y) ? 366 : 365);
+
+        int MonthDays[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        if (IsLeapYear(Year)) MonthDays[2] = 29;
+
+        for (int i = 0; i < Month - 1; ++i) IntDate += MonthDays[i + 1];
+        IntDate += Day - 1;
+
+        if (IsBefore1970) IntDate = IntDate - 365 - (IsLeapYear(Year) ? 1 : 0);
+    }
+
+    std::string IntDate2StrDate(int IntDate)
+    {
+        int Year = 1970;
+        while (IntDate < 0 || IntDate >= (IsLeapYear(Year) ? 366 : 365))
+        {
+            if (IntDate < 0)
+            {
+                --Year;
+                IntDate += IsLeapYear(Year) ? 366 : 365;
+            }
+            else
+            {
+                IntDate -= IsLeapYear(Year) ? 366 : 365;
+                ++Year;
+            }
+        }
+
+        int MonthDays[] = {31, IsLeapYear(Year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        int Month = 0;
+        while (IntDate >= MonthDays[Month])
+        {
+            IntDate -= MonthDays[Month];
+            ++Month;
+        }
+        int Day = IntDate + 1;
+        Month += 1;
+        std::ostringstream oss;
+        oss << std::setw(4) << std::setfill('0') << Year << "-" << std::setw(2) << std::setfill('0') << Month << "-"
+            << std::setw(2) << std::setfill('0') << Day;
+
+        return oss.str();
+    }
+
+    bool CheckDate(int IntDate) { return IntDate != (int)MinInt; }
+    #undef MinInt
 }  // namespace common

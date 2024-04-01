@@ -17,6 +17,7 @@ See the Mulan PSL v2 for more details. */
 #include "storage/db/db.h"
 #include "storage/table/table.h"
 #include <iostream>
+#include "common/lang/string.h"
 InsertStmt::InsertStmt(Table *table, const Value *values, int value_amount)
     : table_(table), values_(values), value_amount_(value_amount)
 {}
@@ -59,9 +60,9 @@ RC InsertStmt::create(Db *db, const InsertSqlNode &inserts, Stmt *&stmt)
       return RC::SCHEMA_FIELD_TYPE_MISMATCH;
     }
     else if(field_type == DATES){
-      //Reference: https://github.com/CentaureaHO/miniob/commit/aa79cab73f851555116cd1a533f1cb7f5cfd2fb3#diff-253ca6b9e9f18d82a8a0bc35d12e570b32432b8ee5415d32ad2bb27d7d56224d
- 
-      if (!CheckDate(values[i].get_date())) 
+      //Reference: https://github.com/CentaureaHO/miniob/blob/oceanbase-competition-2023/src/observer/sql/stmt/insert_stmt.cpp
+      
+      if (!common::CheckDate(values[i].get_date())) 
         return RC::SCHEMA_FIELD_TYPE_MISMATCH;
     }
   }
