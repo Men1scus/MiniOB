@@ -32,11 +32,11 @@ RC ParseStage::handle_request(SQLStageEvent *sql_event)
   RC rc = RC::SUCCESS;
 
   SqlResult         *sql_result = sql_event->session_event()->sql_result();
-  const std::string &sql        = sql_event->sql();
+  const std::string &sql        = sql_event->sql(); // 输入的SQL语句
 
-  ParsedSqlResult parsed_sql_result;
+  ParsedSqlResult parsed_sql_result; // parse stage的解析结果保存在该变量中
 
-  parse(sql.c_str(), &parsed_sql_result);
+  parse(sql.c_str(), &parsed_sql_result); // 词法，语法分析接口，此处跳入 .l 与 yacc 定义的解析规则中
   if (parsed_sql_result.sql_nodes().empty()) {
     sql_result->set_return_code(RC::SUCCESS);
     sql_result->set_state_string("");
@@ -47,7 +47,7 @@ RC ParseStage::handle_request(SQLStageEvent *sql_event)
     LOG_WARN("got multi sql commands but only 1 will be handled");
   }
 
-  std::unique_ptr<ParsedSqlNode> sql_node = std::move(parsed_sql_result.sql_nodes().front());
+  std::unique_ptr<ParsedSqlNode> sql_node = std::move(parsed_sql_result.sql_nodes().front()); // 解析结果存储到 sql_node变量中
   if (sql_node->flag == SCF_ERROR) {
     // set error information to event
     rc = RC::SQL_SYNTAX;
@@ -56,7 +56,7 @@ RC ParseStage::handle_request(SQLStageEvent *sql_event)
     return rc;
   }
 
-  sql_event->set_sql_node(std::move(sql_node));
+  sql_event->set_sql_node(std::move(sql_node)); // 解析结果存储到sql_event中，parse阶段结束
 
   return RC::SUCCESS;
 }

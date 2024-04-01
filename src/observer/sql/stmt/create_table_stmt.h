@@ -16,7 +16,7 @@ See the Mulan PSL v2 for more details. */
 
 #include <string>
 #include <vector>
-
+#include <iostream>
 #include "sql/stmt/stmt.h"
 
 class Db;
@@ -26,7 +26,7 @@ class Db;
  * @ingroup Statement
  * @details 虽然解析成了stmt，但是与原始的SQL解析后的数据也差不多
  */
-class CreateTableStmt : public Stmt
+class CreateTableStmt : public Stmt // 将 sql_node 中保存的关系名、字段名与字段类型转换成了 CreateTableStmt 类型并返回，作为下一阶段的输入
 {
 public:
   CreateTableStmt(const std::string &table_name, const std::vector<AttrInfoSqlNode> &attr_infos)

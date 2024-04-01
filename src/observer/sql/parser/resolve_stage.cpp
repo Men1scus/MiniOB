@@ -29,7 +29,7 @@ See the Mulan PSL v2 for more details. */
 using namespace common;
 
 RC ResolveStage::handle_request(SQLStageEvent *sql_event)
-{
+{ // 33 行 ~ 44 行不需要太过关心
   RC            rc            = RC::SUCCESS;
   SessionEvent *session_event = sql_event->session_event();
   SqlResult    *sql_result    = session_event->sql_result();
@@ -41,11 +41,11 @@ RC ResolveStage::handle_request(SQLStageEvent *sql_event)
     sql_result->set_return_code(rc);
     sql_result->set_state_string("no db selected");
     return rc;
-  }
+  } // 33 行 ~ 44 行不需要太过关心
 
   ParsedSqlNode *sql_node = sql_event->sql_node().get();
   Stmt          *stmt     = nullptr;
-
+  // 将数据库 db、parse 阶段的输出 sql_node、以 及 resolve 阶段的结果指针 stmt 作为参数，创建标准的 Stmt
   rc = Stmt::create_stmt(db, *sql_node, stmt);
   if (rc != RC::SUCCESS && rc != RC::UNIMPLENMENT) {
     LOG_WARN("failed to create stmt. rc=%d:%s", rc, strrc(rc));

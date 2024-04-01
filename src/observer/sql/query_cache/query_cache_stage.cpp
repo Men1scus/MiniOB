@@ -23,8 +23,8 @@ See the Mulan PSL v2 for more details. */
 #include "common/log/log.h"
 
 using namespace common;
-
+// 没有操作 直接返回 SUCCESS
 RC QueryCacheStage::handle_request(SQLStageEvent *sql_event)
 {
-  return RC::SUCCESS;
+  return RC::SUCCESS; 
 }

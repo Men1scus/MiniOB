@@ -78,15 +78,16 @@ void SessionStage::handle_request2(SessionEvent *event)
  * execute_stage中的执行，通过explain语句看需要哪些operator，然后找对应的operator来
  * 调试或者看代码执行过程即可。
  */
+// 之前是环境之类的初始化，对实验二不太重要
 RC SessionStage::handle_sql(SQLStageEvent *sql_event)
 {
-  RC rc = query_cache_stage_.handle_request(sql_event);
+  RC rc = query_cache_stage_.handle_request(sql_event); // 此阶段其实并没有做任何的实现
   if (OB_FAIL(rc)) {
     LOG_TRACE("failed to do query cache. rc=%s", strrc(rc));
     return rc;
   }
 
-  rc = parse_stage_.handle_request(sql_event);
+  rc = parse_stage_.handle_request(sql_event); // 通常在这里打断点
   if (OB_FAIL(rc)) {
     LOG_TRACE("failed to do parse. rc=%s", strrc(rc));
     return rc;

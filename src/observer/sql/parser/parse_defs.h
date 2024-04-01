@@ -146,7 +146,7 @@ struct UpdateSqlNode
  */
 struct AttrInfoSqlNode
 {
-  AttrType    type;    ///< Type of attribute
+  AttrType    type;    ///< Type of attribute 枚举变量
   std::string name;    ///< Attribute name
   size_t      length;  ///< Length of attribute
 };
@@ -295,7 +295,7 @@ public:
   InsertSqlNode       insertion;
   DeleteSqlNode       deletion;
   UpdateSqlNode       update;
-  CreateTableSqlNode  create_table;
+  CreateTableSqlNode  create_table; // 保存表名、属性名以及属性类型
   DropTableSqlNode    drop_table;
   CreateIndexSqlNode  create_index;
   DropIndexSqlNode    drop_index;
@@ -318,7 +318,10 @@ class ParsedSqlResult
 public:
   void add_sql_node(std::unique_ptr<ParsedSqlNode> sql_node);
 
-  std::vector<std::unique_ptr<ParsedSqlNode>> &sql_nodes() { return sql_nodes_; }
+  std::vector<std::unique_ptr<ParsedSqlNode>> &sql_nodes() 
+  { 
+    return sql_nodes_; 
+  }
 
 private:
   std::vector<std::unique_ptr<ParsedSqlNode>> sql_nodes_;  ///< 这里记录SQL命令。虽然看起来支持多个，但是当前仅处理一个

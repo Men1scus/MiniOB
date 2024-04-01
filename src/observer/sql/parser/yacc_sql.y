@@ -77,6 +77,7 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
         INT_T
         STRING_T
         FLOAT_T
+        DATE_T
         HELP
         EXIT
         DOT //QUOTE
@@ -97,10 +98,10 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
         LE
         GE
         NE
-
+// 定义了解析过程中可以识别的全部 token 类型，也对应了 lex_sql.l 文件中每一个模式返回的 token 类型 
 /** union 中定义各种数据类型，真实生成的代码也是union类型，所以不能有非POD类型的数据 **/
 %union {
-  ParsedSqlNode *                   sql_node;
+  ParsedSqlNode *                   sql_node; // sql_node 即 ParsedSqlNode*类型
   ConditionSqlNode *                condition;
   Value *                           value;
   enum CompOp                       comp;
@@ -114,7 +115,7 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
   std::vector<RelAttrSqlNode> *     rel_attr_list;
   std::vector<std::string> *        relation_list;
   char *                            string;
-  int                               number;
+  int                               number; // token type 的 C/C++变量类型是 int 类型
   float                             floats;
 }
 
@@ -122,10 +123,11 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
 %token <floats> FLOAT
 %token <string> ID
 %token <string> SSS
+%token <string> DATE_STR
 //非终结符
 
 /** type 定义了各种解析后的结果输出的是什么类型。类型对应了 union 中的定义的成员变量名称 **/
-%type <number>              type
+%type <number>              type // token type 的 C/C++变量类型是 int 类型
 %type <condition>           condition
 %type <value>               value
 %type <number>              number
@@ -146,7 +148,7 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
 %type <sql_node>            insert_stmt
 %type <sql_node>            update_stmt
 %type <sql_node>            delete_stmt
-%type <sql_node>            create_table_stmt
+%type <sql_node>            create_table_stmt // create_table_stmt 是 sql_node 类型
 %type <sql_node>            drop_table_stmt
 %type <sql_node>            show_tables_stmt
 %type <sql_node>            desc_table_stmt
@@ -280,10 +282,10 @@ drop_index_stmt:      /*drop index 语句的语法解析树*/
       free($5);
     }
     ;
-create_table_stmt:    /*create table 语句的语法解析树*/
-    CREATE TABLE ID LBRACE attr_def attr_def_list RBRACE
+create_table_stmt:    /*create table 语句的语法解析树*/ //对 CREATE TABLE 建表语句的语法规则描述
+    CREATE TABLE ID LBRACE attr_def attr_def_list RBRACE // 定义了哪些类型的 token 的组合构成了建表语句
     {
-      $$ = new ParsedSqlNode(SCF_CREATE_TABLE);
+      $$ = new ParsedSqlNode(SCF_CREATE_TABLE); // $ $表示语法规则左侧即 create_table_stmt 变量,$ 1 表示 CREATE 对应的变量,以此类推
       CreateTableSqlNode &create_table = $$->create_table;
       create_table.relation_name = $3;
       free($3);
@@ -337,10 +339,11 @@ attr_def:
 number:
     NUMBER {$$ = $1;}
     ;
-type:
+type: // token INT_T 在语法分析阶段会被视作 token type
     INT_T      { $$=INTS; }
-    | STRING_T { $$=CHARS; }
-    | FLOAT_T  { $$=FLOATS; }
+    | STRING_T { $$=CHARS; } // token type 还可以标识的其他类型
+    | FLOAT_T  { $$=FLOATS; } // token type 还可以标识的其他类型
+    | DATE_T   { $$=DATES; }
     ;
 insert_stmt:        /*insert   语句的语法解析树*/
     INSERT INTO ID VALUES LBRACE value value_list RBRACE 
@@ -386,6 +389,12 @@ value:
       char *tmp = common::substr($1,1,strlen($1)-2);
       $$ = new Value(tmp);
       free(tmp);
+      free($1);
+    }
+    |DATE_STR {
+      char* tmp = common::substr($1, 1, strlen($1) - 2); // 取子字符串
+      $$ = new Value(tmp, strlen(tmp), 1); // 创建了一个新的Value对象，并将其赋值给$ $
+      free(tmp); // 释放了tmp指向的内内存
       free($1);
     }
     ;

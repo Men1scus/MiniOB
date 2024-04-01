@@ -53,7 +53,7 @@ RC Stmt::create_stmt(Db *db, ParsedSqlNode &sql_node, Stmt *&stmt)
       return CreateIndexStmt::create(db, sql_node.create_index, stmt);
     }
 
-    case SCF_CREATE_TABLE: {
+    case SCF_CREATE_TABLE: { // sql_node.flag 为 SCF_CREATE_TABLE
       return CreateTableStmt::create(db, sql_node.create_table, stmt);
     }
 
