@@ -33,10 +33,25 @@ class Expression;
  * Rel -> Relation
  * Attr -> Attribute
  */
+
+// 聚合函数类型的声明
+enum AggrOp
+{
+  AGGR_SUM,
+  AGGR_AVG,
+  AGGR_MAX,
+  AGGR_MIN,
+  AGGR_COUNT,
+  AGGR_COUNT_ALL,
+  AGGR_NONE
+};
 struct RelAttrSqlNode
 {
   std::string relation_name;   ///< relation name (may be NULL) 表名
   std::string attribute_name;  ///< attribute name              属性名
+  AggrOp      aggregation = AGGR_NONE; ///< aggregation (may be empty) 聚合操作
+  bool valid = true; ///< 判断聚合是否合法
+  
 };
 
 /**
@@ -91,6 +106,7 @@ struct SelectSqlNode
   std::vector<RelAttrSqlNode>   attributes;  ///< attributes in select clause
   std::vector<std::string>      relations;   ///< 查询的表
   std::vector<ConditionSqlNode> conditions;  ///< 查询条件，使用AND串联起来多个条件
+  std::string                   aggregation;
 };
 
 /**

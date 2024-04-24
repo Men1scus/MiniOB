@@ -37,6 +37,14 @@ RC ParseStage::handle_request(SQLStageEvent *sql_event)
   ParsedSqlResult parsed_sql_result; // parse stage的解析结果保存在该变量中
 
   parse(sql.c_str(), &parsed_sql_result); // 词法，语法分析接口，此处跳入 .l 与 yacc 定义的解析规则中
+
+  try{
+    parse(sql.c_str(), &parsed_sql_result);
+  }catch(...){
+    sql_result->set_return_code(RC::INVALID_ARGUMENT);
+    return RC::INVALID_ARGUMENT;
+  }
+  
   if (parsed_sql_result.sql_nodes().empty()) {
     sql_result->set_return_code(RC::SUCCESS);
     sql_result->set_state_string("");
