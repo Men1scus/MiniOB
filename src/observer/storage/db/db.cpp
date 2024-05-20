@@ -29,10 +29,10 @@ See the Mulan PSL v2 for more details. */
 
 Db::~Db()
 {
+  LOG_INFO("Db has been closed: %s", name_.c_str());
   for (auto &iter : opened_tables_) {
     delete iter.second;
   }
-  LOG_INFO("Db has been closed: %s", name_.c_str());
 }
 
 RC Db::init(const char *name, const char *dbpath)
@@ -134,15 +134,15 @@ RC Db::open_all_tables()
     Table *table = new Table();
     rc           = table->open(filename.c_str(), path_.c_str());
     if (rc != RC::SUCCESS) {
-      delete table;
       LOG_ERROR("Failed to open table. filename=%s", filename.c_str());
+      delete table;
       return rc;
     }
 
     if (opened_tables_.count(table->name()) != 0) {
-      delete table;
       LOG_ERROR("Duplicate table with difference file name. table=%s, the other filename=%s",
           table->name(), filename.c_str());
+      delete table;
       return RC::INTERNAL;
     }
 

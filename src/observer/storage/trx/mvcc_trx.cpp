@@ -190,6 +190,30 @@ RC MvccTrx::delete_record(Table *table, Record &record)
   return RC::SUCCESS;
 }
 
+RC MvccTrx::update_record(Table *table, Record &record,int offset,int len,Value &value)
+{
+  Field begin_field;
+  Field end_field;
+  trx_fields(table, begin_field, end_field);
+  
+  int ClosedBy=end_field.get_int(record);
+  ASSERT(ClosedBy >0&& ClosedBy == trx_kit_.max_trx_id(),
+      "Concurrency conflict or not latest version. closed by %d, trx id=%d, rid=%s",
+      ClosedBy,
+      trx_id_,
+      record.rid().to_string().c_str());
+  
+  RC rc=table->update_record(record, len, offset,value);
+  ASSERT(rc == RC::SUCCESS,"Failed to update. rc=%s",strrc(rc));
+
+  end_field.set_int(record,-trx_id_);
+  rc = log_manager_->append_log(CLogType::DELETE, trx_id_, table->table_id(), record.rid(), 0, 0, nullptr);
+  ASSERT(rc== RC::SUCCESS, "Failed to append delete record log. rc=%s", strrc(rc));
+  operations_.insert(Operation(Operation::Type::DELETE, table, record.rid()));
+
+  return RC::SUCCESS;
+}
+
 RC MvccTrx::visit_record(Table *table, Record &record, bool readonly)
 {
   Field begin_field;
