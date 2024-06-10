@@ -109,6 +109,12 @@ struct SelectSqlNode
   std::string                   aggregation;
 };
 
+struct JoinSqlNode
+{
+  std::vector<std::string>        relations;
+  std::vector<ConditionSqlNode>   conditions;
+};
+
 /**
  * @brief 算术表达式计算的语法树
  * @ingroup SQLParser

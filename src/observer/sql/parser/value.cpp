@@ -213,7 +213,14 @@ int Value::compare(const Value &other) const
   } else if (this->attr_type_ == FLOATS && other.attr_type_ == INTS) {
     float other_data = other.num_value_.int_value_;
     return common::compare_float((void *)&this->num_value_.float_value_, (void *)&other_data);
-  }
+  }else if (this->attr_type_ == CHARS && (other.attr_type_ == INTS)) {
+    float this_data = atof(this->str_value_.substr(0,this->str_value_.size()-1).c_str());
+    float other_data=other.num_value_.int_value_;
+    return common::compare_float((void *)&this_data, (void *)&other_data);
+  }else if (this->attr_type_ == CHARS && (other.attr_type_ == FLOATS)) {
+    float this_data = atof(this->str_value_.substr(0,this->str_value_.size()-1).c_str());
+    return common::compare_float((void *)&this_data, (void *)&other.num_value_.float_value_);
+    }
   LOG_WARN("not supported");
   return -1;  // TODO return rc?
 }
